@@ -92,8 +92,8 @@ void logCamera()
     Vector3 direction = Vector3Normalize(Vector3Subtract(camera.target,camera.position));
     Vector2 mousePosition = GetMousePosition();
 
-    printf("POSITION: x: %f | y: %f | z: %f\n",camera.position.x,camera.position.y,camera.position.z);
-    printf("MOUSE_POSITION: x: %f | y: %f\n",mousePosition.x,mousePosition.y);
+    // printf("POSITION: x: %f | y: %f | z: %f\n",camera.position.x,camera.position.y,camera.position.z);
+    // printf("MOUSE_POSITION: x: %f | y: %f\n",mousePosition.x,mousePosition.y);
     printf("DIRECTION: x: %f | y: %f | z: %f\n",direction.x,direction.y,direction.z);
 }
 
@@ -109,12 +109,32 @@ void controlCamera()
     y = sin(pitch);
     z = -cos(pitch) * cos(yaw);
 
-    Vector3 direction = (Vector3){x,y,z};
-    camera.target = Vector3Add(camera.position,direction);
+    Vector3 lookDirection = (Vector3){x,y,z};
+
+
+    Vector3 forwardDirection = Vector3Normalize((Vector3){lookDirection.x,0,lookDirection.z});
+    Vector3 rightDirection = Vector3Normalize(Vector3CrossProduct(forwardDirection,camera.up));
+
+    printf("DIRECTION: x: %f | y: %f | z: %f\n",forwardDirection.x,forwardDirection.y,forwardDirection.z);
 
     if(IsKeyDown(KEY_W))
-        camera.position = Vector3Add(Vector3Scale(direction,0.5f),camera.position);
+        camera.position = Vector3Add(Vector3Scale(forwardDirection,0.5f),camera.position);
+        
     if(IsKeyDown(KEY_S))
-        camera.position = Vector3Add(Vector3Scale(direction,-0.5f),camera.position);
+        camera.position = Vector3Add(Vector3Scale(forwardDirection,-0.5f),camera.position);
+
+    if(IsKeyDown(KEY_A))
+    {
+        printf("RIGHT_DIRECTION: x: %f | y: %f | z: %f\n",rightDirection.x,rightDirection.y,rightDirection.z);
+        camera.position = Vector3Add(Vector3Scale(rightDirection,-0.5f),camera.position);
+    }
+    if(IsKeyDown(KEY_D))
+    {
+        printf("RIGHT_DIRECTION: x: %f | y: %f | z: %f\n",rightDirection.x,rightDirection.y,rightDirection.z);
+        camera.position = Vector3Add(Vector3Scale(rightDirection,0.5f),camera.position);
+    }
+
+    camera.target = Vector3Add(camera.position,lookDirection);
+
 
 }
