@@ -37,7 +37,7 @@ void App_Update(App *app, float dt)
     
     if(app->input.kick)
     {
-        Vector3 impulse = {10.05f,0,0};
+        Vector3 impulse = {5.0f,0,0};
         Physics_ApplyImpulse(&app->world.cube,impulse);
     }
 

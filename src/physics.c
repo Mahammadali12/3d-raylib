@@ -53,7 +53,7 @@ void Physics_ApplyFriction(Body *body, float dt)
     if (predicted_pos.y - body->halfSize >= MINIMUM_INTERACTION_HEIGHT)
     {
         //On the air: NO FRICTION FORCE
-        printf("POS y: %f | PRED: y %f\n",body->position.y,predicted_pos.y);
+        // printf("POS y: %f | PRED: y %f\n",body->position.y,predicted_pos.y);
     }
     else
     {
@@ -67,6 +67,14 @@ void Physics_ApplyFriction(Body *body, float dt)
             printf("No friction applied, speed too low\n");
             return;
         } 
+
+        if (fabsf(speed - 5.0f) < 0.001f) {
+            float stopTime = speed / (FRICTION_COEFFICIENT * PHYSICS_GRAVITY);
+            float slideDistance = speed * speed /
+                                  (2.0f * FRICTION_COEFFICIENT * PHYSICS_GRAVITY);
+            printf("FRICTION VERIFY: vx=%.2f mu=%.2f stop=%.2f s distance=%.2f m\n",
+                   speed, FRICTION_COEFFICIENT, stopTime, slideDistance);
+        }
 
         Vector3 friction = { -vx / speed * frictionMagnitude , 0.0f , 0.0f}; // in Newtons
         // friction is added as acceleration (F/m) 
