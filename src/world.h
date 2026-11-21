@@ -1,14 +1,14 @@
 #ifndef WORLD_H
 #define WORLD_H
 
-#include <raylib.h>
+#include "body.h"
 
-// Everything that exists in the scene. Physics state will live here later.
+// Everything that exists in the scene.
 typedef struct World {
-    Vector3 cubePosition;
-    float   cubeSize;
+    Body cube;
 } World;
 
+// Also used as "reset": restores the initial state.
 void World_Init(World *w);
 
 #endif

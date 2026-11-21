@@ -2,13 +2,17 @@
 
 void Render_Frame(const FlyCamera *cam, const World *world)
 {
+    const Body *c = &world->cube;
+    float size = c->halfSize * 2.0f;
+
     BeginDrawing();
         ClearBackground(RAYWHITE);
 
         BeginMode3D(cam->camera);
-            DrawCube(world->cubePosition, world->cubeSize, world->cubeSize, world->cubeSize, RED);
-            DrawCubeWires(world->cubePosition, world->cubeSize, world->cubeSize, world->cubeSize, MAROON);
-            DrawGrid(10, 1.0f);
+            DrawCube(c->position, size, size, size, RED);
+            DrawCubeWires(c->position, size, size, size, MAROON);
+            // DrawRectangle();
+            DrawGrid(5, 1.0f);
         EndMode3D();
 
         DrawFPS(10, 10);

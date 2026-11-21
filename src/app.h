@@ -11,7 +11,8 @@ typedef struct App {
     Input     input;
     FlyCamera cam;
     World     world;
-    bool      debug; // toggled with F3
+    float     physicsAccumulator; // leftover frame time not yet simulated, seconds
+    bool      debug;              // toggled with F3
 } App;
 
 void App_Init(App *app);
