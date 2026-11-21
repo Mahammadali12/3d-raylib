@@ -64,7 +64,7 @@ void App_Update(App *app, float dt)
 
 
     Vector3 pushDirection = (Vector3){app->input.pushX/magnitude,app->input.kickUp/magnitude,app->input.pushZ/magnitude};
-    app->world.cube.force = Vector3Scale(pushDirection,15);
+    app->world.bodies[0].force = Vector3Scale(pushDirection,15);
 
     // Fixed-timestep physics: consume real time in constant-size steps.
     app->physicsAccumulator += Clamp(dt, 0.0f, MAX_FRAME_TIME);
@@ -80,8 +80,8 @@ void App_Update(App *app, float dt)
         Vector3 d = FlyCamera_Direction(&app->cam);
         // printf("DIRECTION: x: %f | y: %f | z: %f | CUBE: y: %f vy: %f\n",
         //        d.x, d.y, d.z, app->world.cube.position.y, app->world.cube.velocity.y);
-        printf("CUBE: x: %f vx: %f\n",
-               app->world.cube.position.x, app->world.cube.velocity.x);
+        // printf("CUBE: x: %f vx: %f\n",
+            //    app->world.cube.position.x, app->world.cube.velocity.x);
     }
 }
 

@@ -2,8 +2,8 @@
 
 void Render_Frame(const FlyCamera *cam, const World *world)
 {
-    const Body *c = &world->cube;
-    float size = c->halfSize * 2.0f;
+    const Body *c = &world->bodies[0];
+    float size = c->halfExtents.x * 2.0f;
 
     BeginDrawing();
         ClearBackground(RAYWHITE);

@@ -7,11 +7,12 @@
 typedef struct Body {
     Vector3 position;    // center of the cube, meters
     Vector3 velocity;    // meters per second
-    float   halfSize;    // half the edge length, meters
+    Vector3 halfExtents;  // Distnace from center to the each axis
     float   restitution; // 0 = no bounce, 1 = perfectly elastic
     float   mass;
     bool    grounded;
     Vector3 force;
+    int     invMass; // 0 means immoveable (static) object
 } Body;
 
 #endif

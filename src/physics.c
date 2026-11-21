@@ -10,8 +10,7 @@ static void Body_Step(Body *b, float dt)
     Physics_ApplyGravity(b,dt);
     b->velocity = Vector3Add(b->velocity,Vector3Scale(b->force,dt/b->mass));
 
-    float bottom = b->position.y - b->halfSize;
-    b->grounded = bottom <= GROUND_Y;
+    
     Physics_ApplyFriction(b,dt);
     Physics_ApplyDrag(b,dt);
 
@@ -19,9 +18,9 @@ static void Body_Step(Body *b, float dt)
     b->position = Vector3Add(b->position, Vector3Scale(b->velocity, dt));
 
     // Ground plane: test the bottom face, not the center.
-    bottom = b->position.y - b->halfSize;
+    float bottom = b->position.y - b->halfExtents.y;
     if (bottom < GROUND_Y) {
-        b->position.y = GROUND_Y + b->halfSize; // push out of the ground
+        b->position.y = GROUND_Y + b->halfExtents.y; // push out of the ground
         b->grounded = true;
 
         if (b->velocity.y < 0.0f) {
@@ -95,7 +94,7 @@ void Physics_ApplyDrag(Body *body, float dt)
     if (speed < EPSILON) return; // nothing to do
 
     // Projected area of cube
-    float area = body->halfSize*body->halfSize*2;
+    float area = body->halfExtents.y*2*body->halfExtents.y*2;
     float rho = 1.225f;
 
     float dragMag = 0.5f * rho * DRAG_COEFFICIENT * area * speed * speed; // Newtons
@@ -110,5 +109,10 @@ void Physics_ApplyDrag(Body *body, float dt)
 
 void Physics_Step(World *world, float dt)
 {
-    Body_Step(&world->cube, dt);
+    for (int i = 0; i < world->count; i++)
+    {
+        if(world->bodies[i].invMass != 0)
+        Body_Step(&world->bodies[i], dt);
+    }
+    
 }
