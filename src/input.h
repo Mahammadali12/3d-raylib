@@ -10,7 +10,9 @@ typedef struct Input {
     float   moveForward; // -1..1
     float   moveRight;   // -1..1
     float   moveUp;      // -1..1
-    bool   kick;        //    0 | 1 
+    bool   kickUp;        //    0 | 1 
+    float   pushX;        //    0 | 1 
+    float   pushZ;        //    0 | 1 
 } Input;
 
 

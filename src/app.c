@@ -36,11 +36,27 @@ void App_Update(App *app, float dt)
 
     FlyCamera_Update(&app->cam, &app->input, dt);
     
-    if(app->input.kick)
+    if(app->input.kickUp)
     {
         Vector3 impulse = {5.0f,0,0};
         Physics_ApplyImpulse(&app->world.cube,impulse);
         printf("F button pressed | process time: %.3f s\n", GetTime());
+    }
+
+    if(app->input.pushX)
+    {
+        Vector3 impulse = {5.0f*app->input.pushX,0,0};
+        Physics_ApplyImpulse(&app->world.cube,impulse);
+        printf("PushX button pressed | process time: %.3f s\n", GetTime());
+
+    }
+
+    if(app->input.pushZ)
+    {
+        Vector3 impulse = {0,0,5.0f*app->input.pushZ};
+        Physics_ApplyImpulse(&app->world.cube,impulse);
+        printf(" pushZ button pressed | process time: %.3f s\n", GetTime());
+
     }
 
     // Fixed-timestep physics: consume real time in constant-size steps.
