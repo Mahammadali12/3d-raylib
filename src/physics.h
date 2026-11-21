@@ -12,6 +12,7 @@
 #define MINIMUM_INTERACTION_HEIGHT 0.001f //Minimum y value needed to be considered on the air
 
 #define FRICTION_COEFFICIENT 0.5f // Mu
+#define DRAG_COEFFICIENT 0.38f
 #define PHYSICS_EPSILON 0.001f // Minimum value needed for kinetic friction to be applied
 
 // Advances the simulation by exactly dt seconds.
@@ -22,6 +23,7 @@ void Physics_ApplyImpulse(Body *body, Vector3 impulse);
 
 void Physics_ApplyGravity(Body *body, float dt);
 void Physics_ApplyFriction(Body *body, float dt);
+void Physics_ApplyDrag(Body *body, float dt);
 
 
 #endif

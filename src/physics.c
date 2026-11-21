@@ -13,7 +13,9 @@ static void Body_Step(Body *b, float dt)
     float bottom = b->position.y - b->halfSize;
     b->grounded = bottom <= GROUND_Y;
     Physics_ApplyFriction(b,dt);
+    Physics_ApplyDrag(b,dt);
 
+    //Integration
     b->position = Vector3Add(b->position, Vector3Scale(b->velocity, dt));
 
     // Ground plane: test the bottom face, not the center.
@@ -48,7 +50,6 @@ void Physics_ApplyGravity(Body *body, float dt)
 {
     // Semi-implicit Euler: velocity first, then position using the NEW velocity.
     body->velocity.y -= PHYSICS_GRAVITY * dt;
-    // body->position = Vector3Add(body->position, Vector3Scale(body->velocity, dt));
 }
 
 void Physics_ApplyFriction(Body *body, float dt)
@@ -86,6 +87,25 @@ void Physics_ApplyFriction(Body *body, float dt)
 
 
     }
+}
+
+void Physics_ApplyDrag(Body *body, float dt)
+{
+    float speed = Vector3Length(body->velocity);
+    if (speed < EPSILON) return; // nothing to do
+
+    // Projected area of cube
+    float area = body->halfSize*body->halfSize*2;
+    float rho = 1.225f;
+
+    float dragMag = 0.5f * rho * DRAG_COEFFICIENT * area * speed * speed; // Newtons
+
+    // Direction opposite velocity
+    Vector3 dir = Vector3Scale(Vector3Normalize(body->velocity), -1.0f);
+    Vector3 dragForce = Vector3Scale(dir, dragMag);
+
+    body->velocity = Vector3Add(body->velocity,Vector3Scale(dragForce,dt/body->mass));
+
 }
 
 void Physics_Step(World *world, float dt)

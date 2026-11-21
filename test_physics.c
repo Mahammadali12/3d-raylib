@@ -7,6 +7,10 @@
 #define SETTLE_STEPS 240
 #define SLIDE_MAX_STEPS 600
 
+#define ANSI_RESET  "\033[0m"
+#define ANSI_GREEN  "\033[32m"
+#define ANSI_RED    "\033[31m"
+
 static int failures;
 
 static void settle(World *world)
@@ -20,7 +24,11 @@ static void settle(World *world)
 
 static void report(const char *name, int passed)
 {
-    printf("%s: %s\n", name, passed ? "PASS" : "FAIL");
+    printf("%s: %s%s%s\n",
+           name,
+           passed ? ANSI_GREEN : ANSI_RED,
+           passed ? "PASS" : "FAIL",
+           ANSI_RESET);
     if (!passed)
         ++failures;
 }
@@ -78,14 +86,32 @@ static int run_axial_slide(float initial_x, float expected_stop_time,
 
 static int test_positive_slide(void)
 {
-    return run_axial_slide(5.0f, 5.0f / (0.5f * PHYSICS_GRAVITY),
-                           25.0f / (2.0f * 0.5f * PHYSICS_GRAVITY));
+    float frictionAcceleration = FRICTION_COEFFICIENT * PHYSICS_GRAVITY;
+    float dragConstant = 0.5f * 1.225f * DRAG_COEFFICIENT *
+                         (2.0f * 1.0f * 1.0f);
+    float expectedTime = atanf(
+        5.0f * sqrtf(dragConstant / frictionAcceleration)) /
+        sqrtf(frictionAcceleration * dragConstant);
+    float expectedDistance = (1.0f / (2.0f * dragConstant)) *
+        logf((dragConstant * 25.0f + frictionAcceleration) /
+             frictionAcceleration);
+
+    return run_axial_slide(5.0f, expectedTime, expectedDistance);
 }
 
 static int test_negative_slide(void)
 {
-    return run_axial_slide(-5.0f, 5.0f / (0.5f * PHYSICS_GRAVITY),
-                           25.0f / (2.0f * 0.5f * PHYSICS_GRAVITY));
+    float frictionAcceleration = FRICTION_COEFFICIENT * PHYSICS_GRAVITY;
+    float dragConstant = 0.5f * 1.225f * DRAG_COEFFICIENT *
+                         (2.0f * 1.0f * 1.0f);
+    float expectedTime = atanf(
+        5.0f * sqrtf(dragConstant / frictionAcceleration)) /
+        sqrtf(frictionAcceleration * dragConstant);
+    float expectedDistance = (1.0f / (2.0f * dragConstant)) *
+        logf((dragConstant * 25.0f + frictionAcceleration) /
+             frictionAcceleration);
+
+    return run_axial_slide(-5.0f, expectedTime, expectedDistance);
 }
 
 static int test_diagonal_slide(void)
@@ -124,9 +150,83 @@ static int test_diagonal_slide(void)
            stopped_step > 0 ? "yes" : "no", distance, max_line_error);
 
     return stopped_step > 0 &&
-           distance > 2.45f &&
-           distance < 2.65f &&
+           distance > 1.25f &&
+           distance < 1.36f &&
            max_line_error < TEST_TOLERANCE;
+}
+
+static int test_drag_zero_velocity(void)
+{
+    Body body = {
+        .velocity = { 0.0f, 0.0f, 0.0f },
+        .halfSize = 1.0f,
+        .mass = 1.0f,
+    };
+
+    Physics_ApplyDrag(&body, 0.1f);
+
+    printf("  zero velocity: vx=%.4f vy=%.4f vz=%.4f\n",
+           body.velocity.x, body.velocity.y, body.velocity.z);
+
+    return fabsf(body.velocity.x) < TEST_TOLERANCE &&
+           fabsf(body.velocity.y) < TEST_TOLERANCE &&
+           fabsf(body.velocity.z) < TEST_TOLERANCE;
+}
+
+static int test_drag_x_formula(void)
+{
+    Body body = {
+        .velocity = { 10.0f, 0.0f, 0.0f },
+        .halfSize = 1.0f,
+        .mass = 1.0f,
+    };
+    float dt = 0.1f;
+
+    float speed = 10.0f;
+    float area = 2.0f * body.halfSize * body.halfSize;
+    float dragMagnitude = 0.5f * 1.225f * DRAG_COEFFICIENT * area * speed * speed;
+    float expectedVx = speed - dragMagnitude * dt / body.mass;
+
+    Physics_ApplyDrag(&body, dt);
+
+    printf("  drag x: vx=%.4f m/s, expected=%.4f m/s, drag=%.4f N\n",
+           body.velocity.x, expectedVx, dragMagnitude);
+
+    return fabsf(body.velocity.x - expectedVx) < TEST_TOLERANCE &&
+           fabsf(body.velocity.y) < TEST_TOLERANCE &&
+           fabsf(body.velocity.z) < TEST_TOLERANCE &&
+           body.velocity.x < speed;
+}
+
+static int test_drag_diagonal_direction(void)
+{
+    Body body = {
+        .velocity = { 3.0f, 0.0f, 4.0f },
+        .halfSize = 1.0f,
+        .mass = 1.0f,
+    };
+    Vector3 initialVelocity = body.velocity;
+
+    Physics_ApplyDrag(&body, 0.1f);
+
+    Vector3 velocityChange = {
+        body.velocity.x - initialVelocity.x,
+        body.velocity.y - initialVelocity.y,
+        body.velocity.z - initialVelocity.z,
+    };
+
+    float dot = initialVelocity.x * velocityChange.x +
+                initialVelocity.z * velocityChange.z;
+    float cross = initialVelocity.x * velocityChange.z -
+                  initialVelocity.z * velocityChange.x;
+
+    printf("  drag diagonal: dot=%.4f, cross=%.4f\n", dot, cross);
+
+    return dot < 0.0f &&
+           fabsf(cross) < TEST_TOLERANCE &&
+           fabsf(velocityChange.y) < TEST_TOLERANCE &&
+           body.velocity.x < initialVelocity.x &&
+           body.velocity.z < initialVelocity.z;
 }
 
 int main(void)
@@ -135,12 +235,15 @@ int main(void)
     report("+5 m/s slide", test_positive_slide());
     report("-5 m/s slide", test_negative_slide());
     report("Diagonal slide", test_diagonal_slide());
+    report("Drag zero velocity", test_drag_zero_velocity());
+    report("Drag x formula", test_drag_x_formula());
+    report("Drag diagonal direction", test_drag_diagonal_direction());
 
     if (failures > 0) {
-        printf("FAIL: %d physics check(s) failed\n", failures);
+        printf(ANSI_RED "FAIL" ANSI_RESET ": %d physics check(s) failed\n", failures);
         return 1;
     }
 
-    printf("PASS: all physics checks passed\n");
+    printf(ANSI_GREEN "PASS" ANSI_RESET ": all physics checks passed\n");
     return 0;
 }
