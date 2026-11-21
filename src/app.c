@@ -34,17 +34,16 @@ void App_Update(App *app, float dt)
     }
 
     FlyCamera_Update(&app->cam, &app->input, dt);
+    
+    if(app->input.kick)
+    {
+        Vector3 impulse = {10.05f,0,0};
+        Physics_ApplyImpulse(&app->world.cube,impulse);
+    }
 
     // Fixed-timestep physics: consume real time in constant-size steps.
     app->physicsAccumulator += Clamp(dt, 0.0f, MAX_FRAME_TIME);
     while (app->physicsAccumulator >= PHYSICS_STEP) {
-
-        if(app->input.kick)
-        {
-            Vector3 force = {0,5,0};
-            Physics_ApplyImpulse(&app->world.cube,force);
-        }
-
 
         Physics_Step(&app->world, PHYSICS_STEP);
         app->physicsAccumulator -= PHYSICS_STEP;
@@ -52,8 +51,10 @@ void App_Update(App *app, float dt)
 
     if (app->debug) {
         Vector3 d = FlyCamera_Direction(&app->cam);
-        printf("DIRECTION: x: %f | y: %f | z: %f | CUBE: y: %f vy: %f\n",
-               d.x, d.y, d.z, app->world.cube.position.y, app->world.cube.velocity.y);
+        // printf("DIRECTION: x: %f | y: %f | z: %f | CUBE: y: %f vy: %f\n",
+        //        d.x, d.y, d.z, app->world.cube.position.y, app->world.cube.velocity.y);
+        printf("CUBE: x: %f vx: %f\n",
+               app->world.cube.position.x, app->world.cube.velocity.x);
     }
 }
 

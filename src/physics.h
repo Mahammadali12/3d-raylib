@@ -9,10 +9,19 @@
 #define PHYSICS_REST_EPS 0.2f            // bounce speeds below this (m/s) become 0
                                          // (must stay above GRAVITY * STEP ~= 0.08)
 
+#define MINIMUM_INTERACTION_HEIGHT 0.001f //Minimum y value needed to be considered on the air
+
+#define FRICTION_COEFFICIENT 5.45f // Mu
+// #define EPSILON 0.001f // Minimum value needed for kinetic friction to be applied
+
 // Advances the simulation by exactly dt seconds.
 // Pure function of (world, dt): no input, no clocks, no drawing.
 void Physics_Step(World *world, float dt);
 
-void Physics_ApplyImpulse(Body *body, Vector3 force);
+void Physics_ApplyImpulse(Body *body, Vector3 impulse);
+
+void Physics_ApplyGravity(Body *body, float dt);
+void Physics_ApplyFriction(Body *body, float dt);
+
 
 #endif

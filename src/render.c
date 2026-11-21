@@ -11,7 +11,6 @@ void Render_Frame(const FlyCamera *cam, const World *world)
         BeginMode3D(cam->camera);
             DrawCube(c->position, size, size, size, RED);
             DrawCubeWires(c->position, size, size, size, MAROON);
-            // DrawRectangle();
             DrawGrid(5, 1.0f);
         EndMode3D();
 
