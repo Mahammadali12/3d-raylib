@@ -10,6 +10,6 @@ void Input_Poll(Input *in)
 
     in->kickUp        = (float)(IsKeyDown(KEY_F));
 
-    in->pushX = (float)(IsKeyDown(KEY_K) - IsKeyDown(KEY_I));
+    in->pushX = (float)(IsKeyDown(KEY_I) - IsKeyDown(KEY_K));
     in->pushZ = (float)(IsKeyDown(KEY_L) - IsKeyDown(KEY_J));
 }

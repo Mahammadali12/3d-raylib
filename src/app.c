@@ -62,6 +62,7 @@ void App_Update(App *app, float dt)
                             app->input.kickUp*app->input.kickUp +
                             app->input.pushZ*app->input.pushZ) + EPSILON; //To avoid division by zero
 
+
     Vector3 pushDirection = (Vector3){app->input.pushX/magnitude,app->input.kickUp/magnitude,app->input.pushZ/magnitude};
     app->world.cube.force = Vector3Scale(pushDirection,15);
 
