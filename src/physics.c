@@ -14,7 +14,7 @@ static void Body_Step(Body *b, float dt)
 
     b->position = Vector3Add(b->position, Vector3Scale(b->velocity, dt));
 
-
+    b->grounded = false;
     // Ground plane: test the bottom face, not the center.
     float bottom = b->position.y - b->halfSize;
     if (bottom < GROUND_Y) {
@@ -25,7 +25,7 @@ static void Body_Step(Body *b, float dt)
 
             // Rest threshold: without this, gravity re-feeds a micro-bounce forever.
             if (fabsf(b->velocity.y) < PHYSICS_REST_EPS)
-                b->velocity.y = 0.0f;
+                b->velocity.y = 0.0f; b->grounded = true;
         }
     }
 }
@@ -55,7 +55,7 @@ void Physics_ApplyFriction(Body *body, float dt)
     // Vector2 predicted_vel = Vector2Add(body->velocity, Vector2Scale(c->acc, dt));
     Vector3 predicted_pos = Vector3Add(body->position, Vector3Scale(body->velocity, dt));
 
-    if (predicted_pos.y - body->halfSize >= MINIMUM_INTERACTION_HEIGHT)
+    if (body->grounded)
     {
         //On the air: NO FRICTION FORCE
         // printf("POS y: %f | PRED: y %f\n",body->position.y,predicted_pos.y);
