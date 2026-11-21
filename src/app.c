@@ -60,7 +60,7 @@ void App_Update(App *app, float dt)
     // }
     float magnitude =   sqrt(app->input.pushX*app->input.pushX + 
                             app->input.kickUp*app->input.kickUp +
-                            app->input.pushZ*app->input.pushZ) + EPSILON; //To avoid division by zero
+                            app->input.pushZ*app->input.pushZ) + PHYSICS_EPSILON; //To avoid division by zero
 
 
     Vector3 pushDirection = (Vector3){app->input.pushX/magnitude,app->input.kickUp/magnitude,app->input.pushZ/magnitude};
