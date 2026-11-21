@@ -8,8 +8,8 @@ void Input_Poll(Input *in)
     in->moveRight   = (float)(IsKeyDown(KEY_D) - IsKeyDown(KEY_A));
     in->moveUp      = (float)(IsKeyDown(KEY_SPACE) - IsKeyDown(KEY_LEFT_CONTROL));
 
-    in->kickUp        = (float)(IsKeyPressed(KEY_F));
+    in->kickUp        = (float)(IsKeyDown(KEY_F));
 
-    in->pushX = (float)(IsKeyPressed(KEY_K) - IsKeyPressed(KEY_I));
-    in->pushZ = (float)(IsKeyPressed(KEY_L) - IsKeyPressed(KEY_J));
+    in->pushX = (float)(IsKeyDown(KEY_K) - IsKeyDown(KEY_I));
+    in->pushZ = (float)(IsKeyDown(KEY_L) - IsKeyDown(KEY_J));
 }

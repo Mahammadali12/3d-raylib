@@ -36,28 +36,34 @@ void App_Update(App *app, float dt)
 
     FlyCamera_Update(&app->cam, &app->input, dt);
     
-    if(app->input.kickUp)
-    {
-        Vector3 impulse = {0,5.0f,0};
-        Physics_ApplyImpulse(&app->world.cube,impulse);
-        printf("F button pressed | process time: %.3f s\n", GetTime());
-    }
+    // if(app->input.kickUp)
+    // {
+    //     Vector3 impulse = {0,5.0f,0};
+    //     Physics_ApplyImpulse(&app->world.cube,impulse);
+    //     printf("F button pressed | process time: %.3f s\n", GetTime());
+    // }
 
-    if(app->input.pushX)
-    {
-        Vector3 impulse = {5.0f*app->input.pushX,0,0};
-        Physics_ApplyImpulse(&app->world.cube,impulse);
-        printf("PushX button pressed | process time: %.3f s\n", GetTime());
+    // if(app->input.pushX)
+    // {
+    //     Vector3 impulse = {5.0f*app->input.pushX,0,0};
+    //     Physics_ApplyImpulse(&app->world.cube,impulse);
+    //     printf("PushX button pressed | process time: %.3f s\n", GetTime());
 
-    }
+    // }
 
-    if(app->input.pushZ)
-    {
-        Vector3 impulse = {0,0,5.0f*app->input.pushZ};
-        Physics_ApplyImpulse(&app->world.cube,impulse);
-        printf(" pushZ button pressed | process time: %.3f s\n", GetTime());
+    // if(app->input.pushZ)
+    // {
+    //     Vector3 impulse = {0,0,5.0f*app->input.pushZ};
+    //     Physics_ApplyImpulse(&app->world.cube,impulse);
+    //     printf(" pushZ button pressed | process time: %.3f s\n", GetTime());
 
-    }
+    // }
+    float magnitude =   sqrt(app->input.pushX*app->input.pushX + 
+                            app->input.kickUp*app->input.kickUp +
+                            app->input.pushZ*app->input.pushZ) + EPSILON; //To avoid division by zero
+
+    Vector3 pushDirection = (Vector3){app->input.pushX/magnitude,app->input.kickUp/magnitude,app->input.pushZ/magnitude};
+    app->world.cube.force = Vector3Scale(pushDirection,15);
 
     // Fixed-timestep physics: consume real time in constant-size steps.
     app->physicsAccumulator += Clamp(dt, 0.0f, MAX_FRAME_TIME);

@@ -10,6 +10,7 @@ typedef struct Body {
     float   halfSize;    // half the edge length, meters
     float   restitution; // 0 = no bounce, 1 = perfectly elastic
     float   mass;
+    Vector3 force;
 } Body;
 
 #endif

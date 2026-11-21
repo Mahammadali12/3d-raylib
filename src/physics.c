@@ -8,7 +8,9 @@
 static void Body_Step(Body *b, float dt)
 {
     Physics_ApplyGravity(b,dt);
+    b->velocity = Vector3Add(b->velocity,Vector3Scale(b->force,dt/b->mass));
     Physics_ApplyFriction(b,dt);
+
 
     b->position = Vector3Add(b->position, Vector3Scale(b->velocity, dt));
 
@@ -30,12 +32,13 @@ static void Body_Step(Body *b, float dt)
 
 void Physics_ApplyImpulse(Body *body, Vector3 impulse)
 {
-    if(body->mass > 0.0f) //Safeguard for division by zero
-    {
-        float inverseMass = 1/body->mass;
-        body->velocity = Vector3Add(body->velocity,Vector3Scale(impulse,inverseMass));
-    }
+    // if(body->mass > 0.0f) //Safeguard for division by zero
+    // {
+    //     float inverseMass = 1/body->mass;
+    //     body->velocity = Vector3Add(body->velocity,Vector3Scale(body->force,inverseMass));
+    // }
 }
+
 
 void Physics_ApplyGravity(Body *body, float dt)
 {
@@ -70,7 +73,7 @@ void Physics_ApplyFriction(Body *body, float dt)
             return;
         } 
 
-        Vector3 direction = Vector3Scale(body->velocity,1/speed);
+        Vector3 direction = Vector3Scale((Vector3){vx,0.0f,vz},1/speed);
         Vector3 inverseDirection = Vector3Scale(direction,-1.0f);
 
         Vector3 friction = Vector3Scale(inverseDirection,frictionMagnitude); // in Newtons
