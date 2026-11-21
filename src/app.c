@@ -38,7 +38,7 @@ void App_Update(App *app, float dt)
     
     if(app->input.kickUp)
     {
-        Vector3 impulse = {5.0f,0,0};
+        Vector3 impulse = {0,5.0f,0};
         Physics_ApplyImpulse(&app->world.cube,impulse);
         printf("F button pressed | process time: %.3f s\n", GetTime());
     }

@@ -63,23 +63,29 @@ void Physics_ApplyFriction(Body *body, float dt)
         float frictionMagnitude = FRICTION_COEFFICIENT * body->mass * PHYSICS_GRAVITY;   //mu * m * g
 
         float vx = body->velocity.x;
-        float speed = fabsf(vx);
+        float vz = body->velocity.z;
+        float speed = sqrt(vx*vx + vz*vz);
         if (speed < EPSILON)
         {
             return;
         } 
 
+        Vector3 direction = Vector3Scale(body->velocity,1/speed);
+        Vector3 inverseDirection = Vector3Scale(direction,-1.0f);
 
-        Vector3 friction = { -vx / speed * frictionMagnitude , 0.0f , 0.0f}; // in Newtons
+        Vector3 friction = Vector3Scale(inverseDirection,frictionMagnitude); // in Newtons
         // friction is added as acceleration (F/m) 
 
         
-        if (frictionMagnitude * dt > speed)
+        if (FRICTION_COEFFICIENT * PHYSICS_GRAVITY * dt > speed)
         {
             body->velocity.x = 0;
+            body->velocity.z = 0;
         }else 
         {
-            body->velocity.x += friction.x * dt / body->mass;
+            body->velocity = Vector3Add(body->velocity,Vector3Scale(friction,dt/body->mass));
+            // body->velocity.x += friction.x * dt / body->mass;
+            // body->velocity.z += friction.z * dt / body->mass;
         }
 
 
