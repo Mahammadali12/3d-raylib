@@ -11,7 +11,7 @@
 
 #define MINIMUM_INTERACTION_HEIGHT 0.001f //Minimum y value needed to be considered on the air
 
-#define FRICTION_COEFFICIENT 5.45f // Mu
+#define FRICTION_COEFFICIENT 0.5f // Mu
 // #define EPSILON 0.001f // Minimum value needed for kinetic friction to be applied
 
 // Advances the simulation by exactly dt seconds.

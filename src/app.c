@@ -1,6 +1,7 @@
 #include "app.h"
 
 #include <stdio.h>
+#include <raylib.h>
 #include <raymath.h>
 #include "physics.h"
 #include "render.h"
@@ -17,7 +18,7 @@ void App_Init(App *app)
     FlyCamera_Init(&app->cam, (Vector3){ 0.0f, 10.0f, 10.0f }, 0.0f, -PI / 4.0f);
 
     app->physicsAccumulator = 0.0f;
-    app->debug = false;
+    app->debug = true;
     DisableCursor();
 }
 
@@ -39,6 +40,7 @@ void App_Update(App *app, float dt)
     {
         Vector3 impulse = {5.0f,0,0};
         Physics_ApplyImpulse(&app->world.cube,impulse);
+        printf("F button pressed | process time: %.3f s\n", GetTime());
     }
 
     // Fixed-timestep physics: consume real time in constant-size steps.
@@ -49,7 +51,9 @@ void App_Update(App *app, float dt)
         app->physicsAccumulator -= PHYSICS_STEP;
     }
 
-    if (app->debug) {
+
+    if (app->debug) 
+    {
         Vector3 d = FlyCamera_Direction(&app->cam);
         // printf("DIRECTION: x: %f | y: %f | z: %f | CUBE: y: %f vy: %f\n",
         //        d.x, d.y, d.z, app->world.cube.position.y, app->world.cube.velocity.y);

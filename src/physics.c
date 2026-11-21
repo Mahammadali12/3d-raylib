@@ -10,6 +10,9 @@ static void Body_Step(Body *b, float dt)
     Physics_ApplyGravity(b,dt);
     Physics_ApplyFriction(b,dt);
 
+    b->position = Vector3Add(b->position, Vector3Scale(b->velocity, dt));
+
+
     // Ground plane: test the bottom face, not the center.
     float bottom = b->position.y - b->halfSize;
     if (bottom < GROUND_Y) {
@@ -23,7 +26,6 @@ static void Body_Step(Body *b, float dt)
                 b->velocity.y = 0.0f;
         }
     }
-    b->position = Vector3Add(b->position, Vector3Scale(b->velocity, dt));
 }
 
 void Physics_ApplyImpulse(Body *body, Vector3 impulse)
@@ -31,7 +33,7 @@ void Physics_ApplyImpulse(Body *body, Vector3 impulse)
     if(body->mass > 0.0f) //Safeguard for division by zero
     {
         float inverseMass = 1/body->mass;
-        body->velocity = Vector3Add(body->velocity,Vector3Scale(impulse,1/body->mass));
+        body->velocity = Vector3Add(body->velocity,Vector3Scale(impulse,inverseMass));
     }
 }
 
@@ -64,25 +66,22 @@ void Physics_ApplyFriction(Body *body, float dt)
         float speed = fabsf(vx);
         if (speed < EPSILON)
         {
-            printf("No friction applied, speed too low\n");
             return;
         } 
 
-        if (fabsf(speed - 5.0f) < 0.001f) {
-            float stopTime = speed / (FRICTION_COEFFICIENT * PHYSICS_GRAVITY);
-            float slideDistance = speed * speed /
-                                  (2.0f * FRICTION_COEFFICIENT * PHYSICS_GRAVITY);
-            printf("FRICTION VERIFY: vx=%.2f mu=%.2f stop=%.2f s distance=%.2f m\n",
-                   speed, FRICTION_COEFFICIENT, stopTime, slideDistance);
-        }
 
         Vector3 friction = { -vx / speed * frictionMagnitude , 0.0f , 0.0f}; // in Newtons
         // friction is added as acceleration (F/m) 
 
+        
+        if (frictionMagnitude * dt > speed)
+        {
+            body->velocity.x = 0;
+        }else 
+        {
+            body->velocity.x += friction.x * dt / body->mass;
+        }
 
-        friction.x = Clamp(friction.x, -body->velocity.x,0.0f);
-        body->velocity.x += friction.x * dt;
-        printf("FRICTION: x: %f \n",friction.x);
 
     }
 }
